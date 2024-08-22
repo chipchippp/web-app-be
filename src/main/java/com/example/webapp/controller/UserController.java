@@ -37,7 +37,7 @@ public class UserController {
             if (!userDTO.getPassword().equals(userDTO.getConfirmPassword())) {
                 return ResponseEntity.badRequest().body("Password not match");
             }
-            userService.saveUser(userDTO);
+            userService.register(userDTO);
             return ResponseEntity.ok("Register Success");
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(e.getMessage());

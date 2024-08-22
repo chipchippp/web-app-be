@@ -6,7 +6,6 @@ import com.example.webapp.exceptions.DataNotFound;
 import com.example.webapp.models.User;
 
 public interface UserService {
-    User saveUser(UserDTO userDTO) throws DataNotFound;
-    String login(String phoneNumber, String password);
-//    boolean existsByName(String name);
+    User register(UserDTO userDTO) throws DataNotFound;
+    String login(String phoneNumber, String password) throws Exception;
 }
