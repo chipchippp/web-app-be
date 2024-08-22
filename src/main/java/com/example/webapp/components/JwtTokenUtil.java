@@ -10,7 +10,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import java.security.InvalidParameterException;
 import java.security.Key;
+import java.security.SecureRandom;
 import java.util.*;
 import java.util.function.Function;
 
@@ -22,8 +24,9 @@ public class JwtTokenUtil {
     @Value("${jwt.secretKey}")
     private String SECRET_KEY;
 
-    public String generateToken(User user) {
+    public String generateToken(User user) throws Exception{
         Map<String, Object> claims = new HashMap<>();
+//        this.generateSecretKey();
         claims.put("phoneNumber", user.getPhoneNumber());
         try {
             String token = Jwts.builder()
@@ -31,17 +34,24 @@ public class JwtTokenUtil {
                     .setSubject(user.getPhoneNumber())
                     .setIssuedAt(new Date(System.currentTimeMillis()))
                     .setExpiration(new Date(System.currentTimeMillis() + EXPIRATION_TIME * 1000L))
-                    .signWith(getSingKey(), SignatureAlgorithm.HS256)
+                    .signWith(SignatureAlgorithm.HS256, getSingKey())
                     .compact();
             return token;
         } catch (Exception e) {
-            System.out.println("Cannot create jwt token, error: " + e.getMessage());
-            return null;
+           throw new InvalidParameterException("Cannot create jwt token, error: " + e.getMessage());
         }
     }
     private Key getSingKey() {
-        byte[] bytes = Decoders.BASE64.decode(SECRET_KEY);
+        byte[] bytes = Decoders.BASE64.decode(SECRET_KEY); // 3Pgwya2DSlH7pVoBvFf3qIdBG9Vv9qF1Iy6cOh5uZz8=
         return Keys.hmacShaKeyFor(bytes);
+    }
+
+    private String generateSecretKey() {
+        SecureRandom secureRandom = new SecureRandom();
+        byte[] bytes = new byte[32];
+        secureRandom.nextBytes(bytes);
+        String secretKey = Base64.getEncoder().encodeToString(bytes);
+        return secretKey;
     }
 
     private Claims extractAllClaims(String token) {

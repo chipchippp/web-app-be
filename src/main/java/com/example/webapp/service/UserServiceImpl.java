@@ -32,8 +32,7 @@ public class UserServiceImpl implements UserService {
         if (userRepository.existsByPhoneNumber(phoneNumber)) {
             throw new RuntimeException("Phone number already exists");
         }
-        User newUser = User
-                .builder()
+        User newUser = User.builder()
                 .fullName(userDTO.getFullName())
                 .phoneNumber(userDTO.getPhoneNumber())
                 .password(userDTO.getPassword())
@@ -54,7 +53,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public String login(String phoneNumber, String password) throws DataNotFound {
+    public String login(String phoneNumber, String password) throws Exception {
         Optional<User> optionalUser = userRepository.findByPhoneNumber(phoneNumber);
         if (optionalUser.isEmpty()){
             throw new DataNotFound("Invalid phone and password");
@@ -65,7 +64,8 @@ public class UserServiceImpl implements UserService {
                 throw new BadCredentialsException("Wrong phone or password");
             }
         }
-        UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(phoneNumber, password);
+        UsernamePasswordAuthenticationToken authenticationToken =
+                new UsernamePasswordAuthenticationToken(phoneNumber, password, user.getAuthorities());
 //        auth with java Spring Security
         authenticationManager.authenticate(authenticationToken);
         return jwtTokenUtil.generateToken(optionalUser.get());

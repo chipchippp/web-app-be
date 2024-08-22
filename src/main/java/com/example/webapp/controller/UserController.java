@@ -2,6 +2,7 @@ package com.example.webapp.controller;
 
 import com.example.webapp.dto.UserDTO;
 import com.example.webapp.dto.UserLoginDTO;
+import com.example.webapp.models.User;
 import com.example.webapp.service.impl.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -37,8 +38,8 @@ public class UserController {
             if (!userDTO.getPassword().equals(userDTO.getConfirmPassword())) {
                 return ResponseEntity.badRequest().body("Password not match");
             }
-            userService.register(userDTO);
-            return ResponseEntity.ok("Register Success");
+            User user = userService.register(userDTO);
+            return ResponseEntity.ok(user);
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
