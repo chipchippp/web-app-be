@@ -48,4 +48,9 @@ public class UserServiceImpl implements UserService {
     public String login(String phoneNumber, String password) {
         return "";
     }
+
+//    @Override
+//    public boolean existsByName(String name) {
+//        return userRepository.existsByName(name);
+//    }
 }

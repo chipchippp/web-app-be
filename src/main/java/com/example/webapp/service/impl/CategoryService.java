@@ -12,4 +12,5 @@ public interface CategoryService {
     Category saveCategory(CategoryDTO category);
     Category updateCategory(Long id, CategoryDTO category);
     void deleteCategory(Long id);
+    boolean existsByName(String name);
 }

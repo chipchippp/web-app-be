@@ -18,11 +18,11 @@ public class OrderDetails {
     private Long id;
     @ManyToOne
     @JoinColumn(name = "order_id")
-    private Order orderId;
+    private Order order;
 
     @ManyToOne
     @JoinColumn(name = "product_id")
-    private Products productId;
+    private Products product;
 
     @Column(nullable = false)
     private Double price;

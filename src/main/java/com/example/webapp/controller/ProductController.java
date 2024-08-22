@@ -166,28 +166,4 @@ public class ProductController {
         }
         return ResponseEntity.ok("Product deleted id: " + id + " successfully");
     }
-
-    @PostMapping("/generateFakerProduct")
-    public ResponseEntity<String> generateFakerProduct() throws Exception {
-        Faker faker = new Faker();
-        for (int i = 0; i < 1000; i++) {
-            String productName = faker.commerce().productName();
-            if (productService.existsByName(productName)) {
-                continue;
-            }
-            ProductDTO productDTO = ProductDTO.builder()
-                    .name(productName)
-                    .price(faker.number().randomDouble(2, 1, 200))
-                    .thumbnail(faker.internet().image())
-                    .description(faker.lorem().sentence())
-                    .categoryId((long)faker.number().numberBetween(1, 4))
-                    .build();
-            try {
-                productService.saveProduct(productDTO);
-            } catch (Exception e) {
-                return ResponseEntity.badRequest().body(e.getMessage());
-            }
-        }
-        return ResponseEntity.ok("Faker product successfully");
-    }
 }

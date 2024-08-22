@@ -7,4 +7,5 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface CategoryRepository extends JpaRepository<Category, Long> {
 //    List<OrderDetails> findByOrderId (Long orderId);
+    boolean existsByName(String name);
 }
