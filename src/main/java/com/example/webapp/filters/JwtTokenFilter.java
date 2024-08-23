@@ -52,13 +52,13 @@ public class JwtTokenFilter extends OncePerRequestFilter {
             if (phoneNumber != null
                     && SecurityContextHolder.getContext().getAuthentication() == null
             ) {
-                UserDetails userDetails = userDetailsService.loadUserByUsername(phoneNumber);
-                if (jwtTokenUtil.validateToken(token, userDetails)) {
+                User user = (User) userDetailsService.loadUserByUsername(phoneNumber);
+                if (jwtTokenUtil.validateToken(token, user)) {
                     UsernamePasswordAuthenticationToken authToken =
                             new UsernamePasswordAuthenticationToken(
-                                    userDetails,
+                                    user,
                                     null,
-                                    userDetails.getAuthorities()
+                                    user.getAuthorities()
                             );
                     authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                     SecurityContextHolder.getContext().setAuthentication(authToken);
