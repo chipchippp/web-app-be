@@ -1,6 +1,7 @@
 package com.example.webapp.config;
 
 import com.example.webapp.filters.JwtTokenFilter;
+import com.example.webapp.models.Role;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -32,10 +33,10 @@ public class WebSecurityConfig {
                                 .requestMatchers(String.format("%s/users/login", apiPrefix),
                                         String.format("%s/users/register", apiPrefix))
                                 .permitAll()
-                                .requestMatchers(GET, String.format("%s/orders/user/**", apiPrefix)).hasAnyRole("USER", "ADMIN")
-                                .requestMatchers(POST, String.format("%s/orders/**", apiPrefix)).hasAnyRole( "ADMIN")
-                                .requestMatchers(PUT, String.format("%s/orders/**", apiPrefix)).hasRole("ADMIN")
-                                .requestMatchers(DELETE, String.format("%s/orders/**", apiPrefix)).hasRole("ADMIN")
+                                .requestMatchers(GET, String.format("%s/orders/user/**", apiPrefix)).hasAnyRole(Role.USER, Role.ADMIN)
+                                .requestMatchers(POST, String.format("%s/orders/**", apiPrefix)).hasAnyRole(Role.USER)
+                                .requestMatchers(PUT, String.format("%s/orders/**", apiPrefix)).hasRole(Role.ADMIN)
+                                .requestMatchers(DELETE, String.format("%s/orders/**", apiPrefix)).hasRole(Role.ADMIN)
 
                                 .anyRequest().authenticated()
 
