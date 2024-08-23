@@ -1,18 +1,17 @@
 package com.example.webapp.filters;
 
 import com.example.webapp.components.JwtTokenUtil;
+import com.example.webapp.models.User;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import jakarta.validation.constraints.NotNull;
+import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.internal.Pair;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.User;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
@@ -33,12 +32,12 @@ public class JwtTokenFilter extends OncePerRequestFilter {
 
     @Override
     protected void doFilterInternal(
-            @NotNull HttpServletRequest request,
-            @NotNull HttpServletResponse response,
-            @NotNull FilterChain filterChain
+            @NonNull  HttpServletRequest request,
+            @NonNull HttpServletResponse response,
+            @NonNull FilterChain filterChain
     ) throws ServletException, IOException {
         try {
-            if (isBypassToken(request)) {
+            if(isBypassToken(request)) {
                 filterChain.doFilter(request, response);
                 return;
             }
@@ -52,36 +51,35 @@ public class JwtTokenFilter extends OncePerRequestFilter {
             if (phoneNumber != null
                     && SecurityContextHolder.getContext().getAuthentication() == null
             ) {
-                User user = (User) userDetailsService.loadUserByUsername(phoneNumber);
-                if (jwtTokenUtil.validateToken(token, user)) {
-                    UsernamePasswordAuthenticationToken authToken =
+                User userDetails = (User) userDetailsService.loadUserByUsername(phoneNumber);
+                if(jwtTokenUtil.validateToken(token, userDetails)) {
+                    UsernamePasswordAuthenticationToken authenticationToken =
                             new UsernamePasswordAuthenticationToken(
-                                    user,
+                                    userDetails,
                                     null,
-                                    user.getAuthorities()
+                                    userDetails.getAuthorities()
                             );
-                    authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-                    SecurityContextHolder.getContext().setAuthentication(authToken);
+                    authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+                    SecurityContextHolder.getContext().setAuthentication(authenticationToken);
                 }
             }
             filterChain.doFilter(request, response);
         } catch (Exception e) {
-            response.sendError(HttpServletResponse.SC_UNAUTHORIZED, e.getMessage());
+            response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Unauthorized");
         }
     }
 
-    private boolean isBypassToken(@NotNull HttpServletRequest request) {
+    private boolean isBypassToken(@NonNull HttpServletRequest request) {
         {
             final List<Pair<String, String>> bypassTokens = Arrays.asList(
-                    Pair.of(String.format("%s/users/register", apiPrefix), "POST"),
-                    Pair.of(String.format("%s/users/login", apiPrefix), "POST"),
                     Pair.of(String.format("%s/products", apiPrefix), "GET"),
-                    Pair.of(String.format("%s/category", apiPrefix), "GET")
+                    Pair.of(String.format("%s/category", apiPrefix), "GET"),
+                    Pair.of(String.format("%s/users/register", apiPrefix), "POST"),
+                    Pair.of(String.format("%s/users/login", apiPrefix), "POST")
             );
-            for (Pair<String, String> bypassToken : bypassTokens) {
-                if (request.getServletPath().contains(bypassToken.getLeft())
-                        && request.getMethod().equals(bypassToken.getRight())
-                ) {
+            for(Pair<String, String> bypassToken: bypassTokens) {
+                if (request.getServletPath().contains(bypassToken.getLeft()) &&
+                        request.getMethod().equals(bypassToken.getRight())) {
                     return true;
                 }
             }

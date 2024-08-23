@@ -5,6 +5,7 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.io.Decoders;
+import io.jsonwebtoken.io.Encoders;
 import io.jsonwebtoken.security.Keys;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -43,7 +44,8 @@ public class JwtTokenUtil {
         }
     }
     private Key getSingKey() {
-        byte[] bytes = Decoders.BASE64.decode(SECRET_KEY); // 3Pgwya2DSlH7pVoBvFf3qIdBG9Vv9qF1Iy6cOh5uZz8=
+        byte[] bytes = Decoders.BASE64.decode(SECRET_KEY);
+        // 3Pgwya2DSlH7pVoBvFf3qIdBG9Vv9qF1Iy6cOh5uZz8=
         return Keys.hmacShaKeyFor(bytes);
     }
 
@@ -51,7 +53,7 @@ public class JwtTokenUtil {
         SecureRandom secureRandom = new SecureRandom();
         byte[] bytes = new byte[32];
         secureRandom.nextBytes(bytes);
-        String secretKey = Base64.getEncoder().encodeToString(bytes);
+        String secretKey = Encoders.BASE64.encode(bytes);
         return secretKey;
     }
 
@@ -94,6 +96,7 @@ public class JwtTokenUtil {
 
     public boolean validateToken(String token, UserDetails userDetails) {
         final String phoneNumber = extractPhoneNumber(token);
-        return (phoneNumber.equals(userDetails.getUsername()) && !isTokenExpired(token));
+        return (phoneNumber.equals(userDetails.getUsername())
+                && !isTokenExpired(token));
     }
 }
